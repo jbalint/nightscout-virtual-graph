@@ -1,0 +1,133 @@
+# Nightscout virtual graph for Stardog
+# stardog namespace add bs --prefix nightscout --uri 'https://github.com/jbalint/nightscout-virtual-graph#'
+# stardog-admin virtual add --overwrite -f sms2 nightscout.properties nightscout.ttl
+# stardog query execute -r bs "select * { GRAPH <virtual://nightscount> { ?x a ?o } }"
+
+# Terminology:
+# MBG = measured blood glucose
+# SGV = sensor glucose value
+# CAL = calibration
+
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+prefix nightscout: <https://github.com/jbalint/nightscout-virtual-graph#>
+
+construct {
+  ?entry a nightscout:Entry ;
+         nightscout:sensorGlucoseValue "{?sgv}"^^xsd:integer ;
+         nightscout:measuredBloodGlucose "{?mbg}"^^xsd:integer ;
+         nightscout:unixDateMillis "{?dateMillis}"^^xsd:integer ;
+         nightscout:type ?type .
+}
+from json {
+  "entries" : {
+    "_id" : "?id",
+    "device" : "?device",
+    "date" : "?dateMillis",
+    "dateString" : "?dateString",
+    "sgv" : "?sgv",
+    "delta" : "?delta",
+    "direction" : "?direction",
+    "type" : "?type",
+    "filtered" : "?filtered",
+    "unfiltered" : "?unfiltered",
+    "rssi" : "?rssi",
+    "noise" : "?noise",
+    "sysTime" : "?sysTime",
+
+    "slope" : "?slope",
+    "intercept" : "?intercept",
+    "scale" : "?scale",
+
+    "mbg" : "?mbg"
+  }
+}
+where {
+  bind(template("https://github.com/jbalint/nightscout-virtual-graph#entry-{id}") as ?entry)
+}
+;
+
+# Example data:
+# {
+#   "_id": ObjectId("5b6b629e25721812bb2982a0"),
+#   "device": "xDrip-DexcomG5",
+#   "date": 1533763769883,
+#   "dateString": "2018-08-08T16:29:29.883-0500",
+#   "sgv": 176,
+#   "delta": 8.058,
+#   "direction": "FortyFiveUp",
+#   "type": "sgv",
+#   "filtered": 188384,
+#   "unfiltered": 201792,
+#   "rssi": 100,
+#   "noise": 1,
+#   "sysTime": "2018-08-08T16:29:29.883-0500"
+# }
+
+# {
+#   "_id": ObjectId("5b723e2125721812bb301b1b"),
+#   "device": "xDrip-DexcomG5",
+#   "type": "cal",
+#   "date": 1534212938279,
+#   "dateString": "2018-08-13T21:15:38.279-0500",
+#   "slope": 1133.3343417878352,
+#   "intercept": 25890.386599560898,
+#   "scale": 1,
+#   "sysTime": "2018-08-13T21:15:38.279-0500"
+# }
+
+# {
+#   "_id": "5b6d00cc25721812bb812e72",
+#   "device": "Manual Entry",
+#   "type": "mbg",
+#   "date": 1533870369511,
+#   "dateString": "2018-08-09T22:06:09.511-0500",
+#   "mbg": 100,
+#   "sysTime": "2018-08-09T22:06:09.511-0500"
+# }
+
+
+construct {
+  ?treatment a nightscout:Treatment ;
+             nightscout:eventType ?eventType ;
+             nightscout:unixDateMillis "{?dateMillis}"^^xsd:integer ;
+             nightscout:notes ?notes ;
+             nightscout:carbs ?carbs 
+}
+from json {
+  "treatments" : {
+    "_id" : "?id",
+    "timestamp" : "?dateMillis",
+    "eventType" : "?eventType",
+    "enteredBy" : "?enteredBy",
+    "notes" : "?notes",
+    "carbs" : "?carbs",
+    "created_at" : "?createdAt",
+    "sysTime" : "?sysTime"
+  }
+}
+where {
+  bind(template("https://github.com/jbalint/nightscout-virtual-graph#treatment-{id}") as ?treatment)
+}
+
+# {
+#   "_id": "2625d4c76c064323830f4931",
+#   "timestamp": 1533607559815,
+#   "eventType": "<none>",
+#   "enteredBy": "xdrip pos:70",
+#   "notes": "a → b",
+#   "uuid": "2625d4c7-6c06-4323-830f-4931af272316",
+#   "carbs": 4,
+#   "created_at": "2018-08-07T02:05:59Z",
+#   "sysTime": "2018-08-06T21:05:59.815-0500"
+# }
+
+# {
+#   "_id": "3b7e214eed9c4affb4f6f96e",
+#   "timestamp": 1530409304324,
+#   "eventType": "Sensor Start",
+#   "enteredBy": "xdrip",
+#   "uuid": "3b7e214e-ed9c-4aff-b4f6-f96e94049361",
+#   "created_at": "2018-07-01T01:41:44Z",
+#   "sysTime": "2018-06-30T20:41:44.324-0500"
+# }
