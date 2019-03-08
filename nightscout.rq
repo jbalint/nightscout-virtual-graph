@@ -1,6 +1,6 @@
 # Nightscout virtual graph for Stardog
 # stardog namespace add bs --prefix nightscout --uri 'https://github.com/jbalint/nightscout-virtual-graph#'
-# stardog-admin virtual add --overwrite -f sms2 nightscout.properties nightscout.ttl
+# stardog-admin virtual add --overwrite -f sms2 nightscout.properties nightscout.rq
 # stardog query execute -r bs "select * { GRAPH <virtual://nightscount> { ?x a ?o } }"
 
 # Terminology:
@@ -12,13 +12,7 @@ prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 prefix nightscout: <https://github.com/jbalint/nightscout-virtual-graph#>
 
-construct {
-  ?entry a nightscout:Entry ;
-         nightscout:sensorGlucoseValue "{?sgv}"^^xsd:integer ;
-         nightscout:measuredBloodGlucose "{?mbg}"^^xsd:integer ;
-         nightscout:unixDateMillis "{?dateMillis}"^^xsd:integer ;
-         nightscout:type ?type .
-}
+mapping
 from json {
   "entries" : {
     "_id" : "?id",
@@ -41,6 +35,13 @@ from json {
 
     "mbg" : "?mbg"
   }
+}
+to {
+  ?entry a nightscout:Entry ;
+         nightscout:sensorGlucoseValue "?sgv"^^xsd:integer ;
+         nightscout:measuredBloodGlucose "?mbg"^^xsd:integer ;
+         nightscout:unixDateMillis "?dateMillis"^^xsd:integer ;
+         nightscout:type ?type .
 }
 where {
   bind(template("https://github.com/jbalint/nightscout-virtual-graph#entry-{id}") as ?entry)
@@ -86,14 +87,7 @@ where {
 #   "sysTime": "2018-08-09T22:06:09.511-0500"
 # }
 
-
-construct {
-  ?treatment a nightscout:Treatment ;
-             nightscout:eventType ?eventType ;
-             nightscout:unixDateMillis "{?dateMillis}"^^xsd:integer ;
-             nightscout:notes ?notes ;
-             nightscout:carbs ?carbs 
-}
+mapping
 from json {
   "treatments" : {
     "_id" : "?id",
@@ -105,6 +99,13 @@ from json {
     "created_at" : "?createdAt",
     "sysTime" : "?sysTime"
   }
+}
+to {
+  ?treatment a nightscout:Treatment ;
+             nightscout:eventType ?eventType ;
+             nightscout:unixDateMillis "?dateMillis"^^xsd:integer ;
+             nightscout:notes ?notes ;
+             nightscout:carbs ?carbs 
 }
 where {
   bind(template("https://github.com/jbalint/nightscout-virtual-graph#treatment-{id}") as ?treatment)
