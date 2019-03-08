@@ -1,0 +1,17 @@
+# Get the latest SGV reading
+select *
+{
+  graph <virtual://nightscout> {
+    # the unixDateMillis is a DOUBLE value in the db
+    { select (xsd:double(max(?unixTime)) as ?maxUnixTime) { [ nightscout:type "sgv" ; nightscout:unixDateMillis ?unixTime ] } }
+    ?entry nightscout:type "sgv" ;
+       nightscout:unixDateMillis ?maxUnixTime ;
+       nightscout:sensorGlucoseValue ?sgv
+  }
+  bind(xsd:dateTime(?maxUnixTime) as ?asDateTime)
+
+  bind(xsd:integer(xsd:dateTime(?maxUnixTime) - "PT30M"^^xsd:dayTimeDuration) as ?30MinsAgo)
+  #bind(xsd:integer(xsd:dateTime(?maxUnixTime) - "PT30M"^^xsd:dayTimeDuration) as ?30MinsAgo2)
+
+  bind(xsd:dateTime(?maxUnixTime) - "PT2H"^^xsd:dayTimeDuration as ?2HoursAgo)
+}
