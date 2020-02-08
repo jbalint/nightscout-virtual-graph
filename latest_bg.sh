@@ -1,9 +1,10 @@
 #!/bin/sh
 
 ROOT=/home/jbalint/sw/java-sw/nightscout-virtual-graph
-QUERY=$ROOT/latest_sgv.rq
+QUERY=$(cat $ROOT/latest_sgv.rq)
 
-VAL=$(stardog query execute bs -f json $QUERY | \
+VAL=$(curl -s -u admin:admin  -H "Accept: application/sparql-results+json" -G https://localhost/stardog/bs/query \
+         --data-urlencode query="$QUERY" | \
           jq '.results.bindings[0].sgv.value' | sed 's/\"//g')
 
 # The relationship between A1C and eAG is described by the formula 28.7 X A1C – 46.7 = eAG.
