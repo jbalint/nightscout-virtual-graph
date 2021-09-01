@@ -3,7 +3,7 @@ select *
 {
   graph <virtual://nightscout> {
     # the unixDateMillis is a DOUBLE value in the db
-    { select (xsd:double(max(?unixTime)) as ?maxUnixTime) { [ nightscout:type "sgv" ; nightscout:unixDateMillis ?unixTime ] } }
+    { select (coalesce(xsd:double(max(?unixTime)), 0) as ?maxUnixTime) { [ nightscout:type "sgv" ; nightscout:unixDateMillis ?unixTime ] } }
     ?entry nightscout:type "sgv" ;
        nightscout:unixDateMillis ?maxUnixTime ;
        nightscout:sensorGlucoseValue ?sgv
