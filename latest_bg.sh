@@ -3,7 +3,9 @@
 ROOT=/home/jbalint/sw/java-sw/nightscout-virtual-graph
 QUERY=$(cat $ROOT/latest_sgv.rq)
 
-VAL=$(curl -s -u admin:admin  -H "Accept: application/sparql-results+json" -G https://localhost/stardog/bs/query \
+source /home/jbalint/sw/banshee-sympatico/percy/curl-params.sh
+
+VAL=$(curl $CURL_PARAMS -s -H "Accept: application/sparql-results+json" -G https://jessandmorgan.com/stardog/bs/query \
          --data-urlencode query="$QUERY" | \
           jq '.results.bindings[0].sgv.value' | sed 's/\"//g')
 
